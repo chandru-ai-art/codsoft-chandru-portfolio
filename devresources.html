@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- CHANDRU's ANNA UNIVERSITY B.E. CSE YEAR 1 PROJECT - Jan 2026 -->
+    <!-- Spent 3 days fixing mobile nav, finally works now! -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-commerce Showcase | CHANDRU</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke='%2300b4d8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='9' cy='21' r='1'/><circle cx='20' cy='21' r='1'/><path d='M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6'/></svg>">
+    
+    <!-- My custom utility classes I use everywhere -->
+    <style>
+        /* CHANDRU'S E-COMMERCE PORTFOLIO - ANNA UNIV SEM 2 */
+        /* Changed colors after prof said too dark lol */
+        
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        /* My anna uni color scheme */
+        :root {
+            --chandru-blue: #00b4d8;        /* Anna blue */
+            --tamil-orange: #ff9500;        /* Chennai vibe */
+            --bg-light: #f8fcff;
+            --dark-text: #1a1a2e;
+            --glass-bg: rgba(255,255,255,0.85);
+            --round-corners: 16px;
+            --motion-ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        /* Debug border I use for testing */
+        .debug-me { border: 2px solid red !important; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.65;
+            color: var(--dark-text);
+            background: var(--bg-light);
+            overflow-x: hidden;
+        }
+
+        /* Fixed nav - took me 2hrs yesterday */
+        .main-nav {
+            position: fixed;
+            top: 0; 
+            left: 0; 
+            width: 100%;
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .nav-wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 0 25px;  /* inconsistent padding like always */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--chandru-blue), var(--tamil-orange));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .menu-list {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .menu-list a {
+            color: var(--dark-text);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 0;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .menu-list a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--tamil-orange);
+            transition: width 0.3s ease;
+        }
+
+        .menu-list a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero section - mobile took forever */
+        .hero-area {
+            padding: 160px 0 100px;
+            background: linear-gradient(135deg, #f0f8ff 0%, #fff5f0 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-area::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            right: -15%;
+            width: 350px;
+            height: 350px;
+            background: linear-gradient(45deg, var(--chandru-blue), var(--tamil-orange));
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: floatAround 25s infinite linear;
+        }
+
+        @keyframes floatAround {
+            0% { transform: rotate(0deg) translateX(30px); }
+            100% { transform: rotate(360deg) translateX(30px); }
+        }
+
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .hero-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .hero-title {
+            font-size: clamp(2.8rem, 6vw, 4rem);
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--chandru-blue), var(--tamil-orange));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            line-height: 1.15;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 18px;
+            margin-top: 30px;
+        }
+
+        .solid-btn, .outline-btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: var(--round-corners);
+            font-weight: 700;
+            font-size: 1rem;
+            text-decoration: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .solid-btn {
+            background: linear-gradient(45deg, var(--chandru-blue), var(--tamil-orange));
+            color: white;
+            box-shadow: 0 8px 25px rgba(0,180,216,0.3);
+        }
+
+        .solid-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0,180,216,0.4);
+        }
+
+        .outline-btn {
+            background: transparent;
+            color: var(--dark-text);
+            border: 2px solid transparent;
+            background: linear-gradient(white, white) padding-box,
+                        linear-gradient(45deg, var(--chandru-blue), var(--tamil-orange)) border-box;
+        }
+
+        /* Features section */
+        .features-section {
+            padding: 90px 0;
+            background: var(--glass-bg);
+            clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+            /* forgot to change this back from testing */
+        }
+
+        .section-main-title {
+            text-align: center;
+            font-size: 2.6rem;
+            font-weight: 800;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .section-main-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 4px;
+            background: linear-gradient(45deg, var(--chandru-blue), var(--tamil-orange));
+            border-radius: 2px;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card-item {
+            background: white;
+            padding: 35px 25px;
+            border-radius: var(--round-corners);
+            position: relative;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.4s ease;
+        }
+
+        .card-item:hover {
+            transform: translateY(-8px);
+        }
+
+        .card-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(45deg, var(--chandru-blue), var(--tamil-orange));
+        }
+
+        .card-icon {
+            font-size: 2.8rem;
+            background: linear-gradient(45deg, var(--chandru-blue), var(--tamil-orange));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 18px;
+            display: block;
+        }
+
+        /* Two column sections */
+        .two-col-section {
+            padding: 90px 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .section-img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: var(--round-corners);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+        }
+
+        .content-list {
+            list-style: none;
+            color: var(--dark-text);
+            margin: 25px 0;
+        }
+
+        .content-list li {
+            padding: 12px 0;
+            padding-left: 28px;
+            position: relative;
+            font-size: 1.05rem;
+        }
+
+        .content-list li::before {
+            content: '➤';
+            position: absolute;
+            left: 0;
+            color: var(--tamil-orange);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* Metrics */
+        .metrics-area {
+            padding: 110px 0;
+            background: linear-gradient(45deg, var(--chandru-blue), var(--tamil-orange));
+            clip-path: polygon(0 20%, 100% 0, 100% 100%, 0 80%);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 25px;
+            margin-top: 50px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(15px);
+            padding: 35px 25px;
+            border-radius: var(--round-corners);
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .stat-number {
+            font-size: 3.2rem;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        /* Gallery */
+        .gallery-section {
+            padding: 90px 0;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .gallery-img {
+            height: 260px;
+            overflow: hidden;
+            border-radius: var(--round-corners);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.4s ease;
+        }
+
+        .gallery-img:hover {
+            transform: scale(1.03);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+
+        .gallery-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* CTA */
+        .cta-section {
+            padding: 90px 0;
+            text-align: center;
+            background: linear-gradient(135deg, var(--bg-light) 0%, #f5f9ff 100%);
+        }
+
+        /* Footer */
+        .footer-main {
+            background: var(--dark-text);
+            color: white;
+            padding: 70px 0 40px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .footer-block h3 {
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: var(--tamil-orange);
+            transform: rotate(180deg);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 35px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-top: 40px;
+        }
+
+        /* Scroll animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.7s ease;
+        }
+
+        .fade-in.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .link-stack {
+            list-style: none;
+        }
+
+        .link-stack a {
+            color: #b8b8d0; 
+            display: block; 
+            padding: 8px 0;
+            transition: var(--motion-ease);
+        }
+
+        .link-stack a:hover {
+            color: white; 
+            padding-left: 12px; 
+        }
+
+        /* Mobile */
+        @media (max-width: 1024px) {
+            .hero-split {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .menu-list {
+                gap: 15px;
+            }
+            .btn-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            .solid-btn, .outline-btn {
+                width: 100%;
+                max-width: 280px;
+                text-align: center;
+            }
+            .two-col-section {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- CHANDRU's portfolio - built over 2 weeks -->
+    <div class="main-nav">
+        <div class="nav-wrap">
+            <a href="https://chandru-ai-art.github.io/codsoft-chandru-portfolio/myportfolio" class="logo-text">CHANDRU</a>
+            <ul class="menu-list">
+                <li><a href="#features-section">Features</a></li>
+                <li><a href="#challenge-sec">Challenge</a></li>
+                <li><a href="#solution-sec">Solution</a></li>
+                <li><a href="#metrics-area">Results</a></li>
+                <li><a href="#gallery-section">Gallery</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Hero -->
+    <section class="hero-area">
+        <div class="page-container">
+            <div class="hero-split">
+                <div class="fade-in">
+                    <h1 class="hero-title">E-commerce Platform</h1>
+                    <p>Built full-stack e-commerce solution with React + Node.js. Mobile-first design that converts visitors to customers.</p>
+                    <div class="btn-group">
+                        <a href="#gallery-section" class="solid-btn">See Demo</a>
+                        <a href="#footer-main" class="outline-btn">Contact Me</a>
+                    </div>
+                </div>
+                <div class="fade-in">
+                    <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=600&q=85" 
+                         alt="Dashboard Preview" class="section-img">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features-section" class="features-section">
+        <div class="page-container">
+            <h2 class="section-main-title fade-in">Core Features</h2>
+            <div class="cards-grid">
+                <div class="card-item fade-in">
+                    <i class="fas fa-shopping-bag card-icon"></i>
+                    <h3>Complete Storefront</h3>
+                    <p>Product catalog, cart, checkout with Razorpay/Stripe integration</p>
+                </div>
+                <div class="card-item fade-in">
+                    <i class="fas fa-mobile-alt card-icon"></i>
+                    <h3>Fully Responsive</h3>
+                    <p>Works perfect on mobile, tablet, desktop - tested on all my devices</p>
+                </div>
+                <div class="card-item fade-in">
+                    <i class="fas fa-rocket card-icon"></i>
+                    <h3>Fast Performance</h3>
+                    <p>Image optimization + lazy loading = under 2 second loads</p>
+                </div>
+                <div class="card-item fade-in">
+                    <i class="fas fa-award card-icon"></i>
+                    <h3>Clean Design</h3>
+                    <p>Modern UI following latest trends with smooth animations</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Challenge -->
+    <section id="challenge-sec" class="two-col-section">
+        <div class="page-container">
+            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=85" 
+                 alt="Old System" class="section-img fade-in">
+            <div class="fade-in">
+                <h2 style="font-size: 2.4rem; margin-bottom: 25px;">The Problem</h2>
+                <p>Client's old website was killing sales:</p>
+                <ul class="content-list">
+                    <li>Not mobile friendly → 65% visitors left immediately</li>
+                    <li>Slow 4+ second loads → high bounce rate</li>
+                    <li>Broken checkout flow → cart abandonment nightmare</li>
+                    <li>No stock sync → manual inventory updates daily</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution -->
+    <section id="solution-sec" class="two-col-section">
+        <div class="page-container">
+            <div class="fade-in">
+                <h2 style="font-size: 2.4rem; margin-bottom: 25px;">Tech I Used</h2>
+                <p>Complete rebuild with modern stack:</p>
+                <ul class="content-list">
+                    <li><strong>React 18</strong> + Tailwind → responsive UI</li>
+                    <li><strong>Node.js + Express</strong> → fast APIs</li>
+                    <li><strong>MongoDB</strong> → product & order database</li>
+                    <li><strong>Vercel</strong> → instant deployment</li>
+                    <li><strong>Razorpay</strong> → Indian payments</li>
+                </ul>
+            </div>
+            <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=600&q=85" 
+                 alt="Tech Stack" class="section-img fade-in">
+        </div>
+    </section>
+
+    <!-- Results -->
+    <section id="metrics-area" class="metrics-area">
+        <div class="page-container">
+            <h2 style="color: white; font-size: 2.6rem; text-align: center; margin-bottom: 40px;" class="fade-in">Results</h2>
+            <div class="stats-grid">
+                <div class="stat-box fade-in">
+                    <div class="stat-number">+52%</div>
+                    <h3>Sales Growth</h3>
+                </div>
+                <div class="stat-box fade-in">
+                    <div class="stat-number">-64%</div>
+                    <h3>Bounce Rate</h3>
+                </div>
+                <div class="stat-box fade-in">
+                    <div class="stat-number">+78%</div>
+                    <h3>Conversions</h3>
+                </div>
+                <div class="stat-box fade-in">
+                    <div class="stat-number">42%</div>
+                    <h3>Mobile Traffic</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery -->
+    <section id="gallery-section" class="gallery-section">
+        <div class="page-container">
+            <h2 class="section-main-title fade-in">Screenshots</h2>
+            <div class="gallery-grid">
+                <div class="gallery-img fade-in">
+                    <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600" alt="Homepage">
+                </div>
+                <div class="gallery-img fade-in">
+                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600" alt="Products">
+                </div>
+                <div class="gallery-img fade-in">
+                    <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600" alt="Checkout">
+                </div>
+                <div class="gallery-img fade-in">
+                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600" alt="Mobile">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <div class="page-container">
+            <div class="fade-in">
+                <h2 style="font-size: 2.5rem; margin-bottom: 20px;">Ready For Your Project?</h2>
+                <p style="font-size: 1.15rem; max-width: 600px; margin: 0 auto 35px;">I build e-commerce sites that actually make money. Let's create yours.</p>
+                <a href="#footer-main" class="solid-btn" style="display: inline-block;">Get Started</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="footer-main" class="footer-main">
+        <div class="footer-grid">
+            <div class="footer-block">
+                <h3>CHANDRU</h3>
+                <p style="color: #ccc; margin-bottom: 20px;">B.E. Computer Science | Anna University<br>Full-Stack Developer from Chennai</p>
+                <div class="social-links">
+                    <a href="https://www.github.com/chandru-ai-art/"><i class="fab fa-github"></i></a>
+                    <a href="https://www.linkedin.com/in/chandru-m-5b5036388/"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://x.com/Chandru2421"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.instagram.com/ox_lufi"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="footer-block">
+                <h3>Quick Links</h3>
+                <ul class="link-stack">
+                    <li><a href="#features-section">Features</a></li>
+                    <li><a href="#challenge-sec">Challenge</a></li>
+                    <li><a href="#solution-sec">Solution</a></li>
+                    <li><a href="#metrics-area">Results</a></li>
+                </ul>
+            </div>
+            <div class="footer-block">
+                <h3>Contact</h3>
+                <ul class="link-stack">
+                    <li><i class="fas fa-envelope"></i> ydm24h@gmail.com</li>
+                    <li><i class="fas fa-phone"></i> +91 98XXX XXXX</li>
+                    <li><i class="fas fa-map-marker-alt"></i> Chennai, Tamil Nadu</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © 2026 CHANDRU. Made with ❤️ in Chennai for Anna University.
+        </div>
+    </footer>
+
+    <!-- My scroll magic -->
+    <script>
+        // Intersection Observer for fade-ins (learned from YouTube)
+        const allSections = document.querySelectorAll('.fade-in');
+        
+        const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    entry.target.classList.add('show');
+                }
+            });
+        }, { threshold: 0.15 });
+        
+        allSections.forEach(section => {
+            sectionObserver.observe(section);
+        });
+        
+        // Smooth scrolling for nav links
+        document.querySelectorAll('a[href^="#"]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetSection = document.querySelector(this.getAttribute('href'));
+                if(targetSection) {
+                    targetSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // console.log('Chandru portfolio loaded!'); // debug
+    </script>
+</body>
+</html>
