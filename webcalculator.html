@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Calculator</title>
+    <link rel="icon" href="https://www.freeiconspng.com/uploads/calculator-icon-1.png">
+    <style>
+        /* Basic reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Body styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Main container */
+        .calc-container {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* Calculator header */
+        .calc-header {
+            background: #2d3436;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .calc-title {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .calc-subtitle {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        /* Display area */
+        .calc-display {
+            background: #2d3436;
+            padding: 20px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-end;
+            border-bottom: 1px solid #444;
+        }
+
+        .calc-operation {
+            color: #aaa;
+            font-size: 18px;
+            min-height: 27px;
+            width: 100%;
+            text-align: right;
+            word-wrap: break-word;
+        }
+
+        .calc-result {
+            color: white;
+            font-size: 36px;
+            font-weight: 600;
+            margin-top: 10px;
+            width: 100%;
+            text-align: right;
+            word-wrap: break-word;
+        }
+
+        /* Button grid */
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: #ddd;
+        }
+
+        /* Button styles */
+        .calc-btn {
+            border: none;
+            background: white;
+            font-size: 20px;
+            font-weight: 500;
+            height: 80px;
+            cursor: pointer;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .calc-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .calc-btn:active {
+            background: #e0e0e0;
+            transform: scale(0.98);
+        }
+
+        /* Special button styles */
+        .btn-operation {
+            background: #f8f9fa;
+            color: #e74c3c;
+            font-size: 22px;
+        }
+
+        .btn-operation:hover {
+            background: #f0f0f0;
+        }
+
+        .btn-equals {
+            background: #e74c3c;
+            color: white;
+            font-size: 22px;
+        }
+
+        .btn-equals:hover {
+            background: #c0392b;
+        }
+
+        .btn-clear {
+            background: #f8f9fa;
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        .btn-clear:hover {
+            background: #f0f0f0;
+        }
+
+        .btn-number {
+            color: #2d3436;
+        }
+
+        .btn-zero {
+            grid-column: span 2;
+        }
+
+        /* Footer */
+        .calc-footer {
+            padding: 15px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+            background: #f8f9fa;
+        }
+
+        /* Responsive design */
+        @media (max-width: 480px) {
+            .calc-container {
+                max-width: 100%;
+            }
+            
+            .calc-btn {
+                height: 70px;
+                font-size: 18px;
+            }
+            
+            .calc-result {
+                font-size: 32px;
+            }
+        }
+
+        /* Active operation indicator */
+        .active-operation {
+            background: #fff9e6;
+        }
+
+        /* Memory indicator */
+        .memory-indicator {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #3498db;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            display: none;
+        }
+
+        /* History panel */
+        .history-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            width: 250px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 100;
+        }
+
+        .history-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2d3436;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .history-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        .history-expression {
+            color: #666;
+        }
+
+        .history-result {
+            color: #2d3436;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* History toggle button */
+        .history-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2d3436;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            z-index: 101;
+        }
+    </style>
+</head>
+<body>
+    <!-- History toggle button -->
+    <button class="history-toggle" onclick="toggleHistory()">H</button>
+    
+    <!-- History panel -->
+    <div class="history-panel" id="historyPanel">
+        <div class="history-title">Calculation History</div>
+        <div id="historyList"></div>
+    </div>
+    
+    <!-- Main calculator container -->
+    <div class="calc-container">
+        <!-- Memory indicator -->
+        <div class="memory-indicator" id="memoryIndicator">M</div>
+        
+        <!-- Calculator header -->
+        <div class="calc-header">
+            <div class="calc-title">Calculator</div>
+            <div class="calc-subtitle">Basic Operations</div>
+        </div>
+        
+        <!-- Calculator display -->
+        <div class="calc-display">
+            <div class="calc-operation" id="operationDisplay"></div>
+            <div class="calc-result" id="resultDisplay">0</div>
+        </div>
+        
+        <!-- Calculator buttons -->
+        <div class="calc-buttons">
+            <!-- Row 1 -->
+            <button class="calc-btn btn-clear" onclick="clearAll()">AC</button>
+            <button class="calc-btn btn-clear" onclick="clearEntry()">CE</button>
+            <button class="calc-btn btn-clear" onclick="backspace()">⌫</button>
+            <button class="calc-btn btn-operation" onclick="appendOperation('÷')">÷</button>
+            
+            <!-- Row 2 -->
+            <button class="calc-btn btn-number" onclick="appendNumber('7')">7</button>
+            <button class="calc-btn btn-number" onclick="appendNumber('8')">8</button>
+            <button class="calc-btn btn-number" onclick="appendNumber('9')">9</button>
+            <button class="calc-btn btn-operation" onclick="appendOperation('×')">×</button>
+            
+            <!-- Row 3 -->
+            <button class="calc-btn btn-number" onclick="appendNumber('4')">4</button>
+            <button class="calc-btn btn-number" onclick="appendNumber('5')">5</button>
+            <button class="calc-btn btn-number" onclick="appendNumber('6')">6</button>
+            <button class="calc-btn btn-operation" onclick="appendOperation('-')">-</button>
+            
+            <!-- Row 4 -->
+            <button class="calc-btn btn-number" onclick="appendNumber('1')">1</button>
+            <button class="calc-btn btn-number" onclick="appendNumber('2')">2</button>
+            <button class="calc-btn btn-number" onclick="appendNumber('3')">3</button>
+            <button class="calc-btn btn-operation" onclick="appendOperation('+')">+</button>
+            
+            <!-- Row 5 -->
+            <button class="calc-btn btn-number btn-zero" onclick="appendNumber('0')">0</button>
+            <button class="calc-btn btn-number" onclick="appendDecimal()">.</button>
+            <button class="calc-btn btn-equals" onclick="calculateResult()">=</button>
+        </div>
+        
+        <!-- Calculator footer -->
+        <div class="calc-footer">
+            &copy; 2026 Chandru .Web Calculator. All rights reserved.
+        </div>
+    </div>
+
+    <script>
+        // Calculator state variables
+        let currentInput = '0';
+        let previousInput = '';
+        let currentOperation = null;
+        let shouldResetScreen = false;
+        let calculationHistory = [];
+        let memoryValue = 0;
+
+        // DOM elements
+        const resultDisplay = document.getElementById('resultDisplay');
+        const operationDisplay = document.getElementById('operationDisplay');
+        const memoryIndicator = document.getElementById('memoryIndicator');
+        const historyList = document.getElementById('historyList');
+        const historyPanel = document.getElementById('historyPanel');
+
+        // Update the display
+        function updateDisplay() {
+            resultDisplay.textContent = formatDisplayNumber(currentInput);
+            
+            if (currentOperation !== null) {
+                operationDisplay.textContent = `${previousInput} ${getOperationSymbol(currentOperation)}`;
+            } else {
+                operationDisplay.textContent = previousInput;
+            }
+        }
+
+        // Format number for display
+        function formatDisplayNumber(number) {
+            const numStr = number.toString();
+            
+            // If number is too long, use scientific notation
+            if (numStr.length > 12) {
+                const num = parseFloat(number);
+                return num.toExponential(6);
+            }
+            
+            return number;
+        }
+
+        // Get symbol for operation
+        function getOperationSymbol(operation) {
+            switch(operation) {
+                case '+': return '+';
+                case '-': return '−';
+                case '×': return '×';
+                case '÷': return '÷';
+                default: return operation;
+            }
+        }
+
+        // Append number to current input
+        function appendNumber(number) {
+            if (shouldResetScreen) {
+                currentInput = '';
+                shouldResetScreen = false;
+            }
+            
+            // Prevent multiple leading zeros
+            if (currentInput === '0' && number !== '.') {
+                currentInput = number;
+            } else {
+                currentInput += number;
+            }
+            
+            updateDisplay();
+        }
+
+        // Append decimal point
+        function appendDecimal() {
+            if (shouldResetScreen) {
+                currentInput = '0';
+                shouldResetScreen = false;
+            }
+            
+            if (!currentInput.includes('.')) {
+                currentInput += '.';
+            }
+            
+            updateDisplay();
+        }
+
+        // Append operation
+        function appendOperation(operation) {
+            if (currentInput === '') return;
+            
+            if (currentOperation !== null) {
+                calculateResult();
+            }
+            
+            previousInput = currentInput;
+            currentOperation = operation;
+            shouldResetScreen = true;
+            
+            updateDisplay();
+        }
+
+        // Perform calculation
+        function calculateResult() {
+            if (currentOperation === null || shouldResetScreen) return;
+            
+            const prev = parseFloat(previousInput);
+            const current = parseFloat(currentInput);
+            
+            if (isNaN(prev) || isNaN(current)) return;
+            
+            let result;
+            
+            try {
+                switch (currentOperation) {
+                    case '+':
+                        result = prev + current;
+                        break;
+                    case '-':
+                        result = prev - current;
+                        break;
+                    case '×':
+                        result = prev * current;
+                        break;
+                    case '÷':
+                        if (current === 0) {
+                            alert('Error: Division by zero');
+                            clearAll();
+                            return;
+                        }
+                        result = prev / current;
+                        break;
+                    default:
+                        return;
+                }
+                
+                // Round to avoid floating point precision issues
+                result = Math.round(result * 100000000) / 100000000;
+                
+                // Add to history
+                addToHistory(`${previousInput} ${getOperationSymbol(currentOperation)} ${currentInput} = ${result}`);
+                
+                // Update calculator state
+                currentInput = result.toString();
+                previousInput = '';
+                currentOperation = null;
+                shouldResetScreen = true;
+                
+                updateDisplay();
+            } catch (error) {
+                alert('Calculation error');
+                clearAll();
+            }
+        }
+
+        // Clear all inputs
+        function clearAll() {
+            currentInput = '0';
+            previousInput = '';
+            currentOperation = null;
+            updateDisplay();
+        }
+
+        // Clear current entry
+        function clearEntry() {
+            currentInput = '0';
+            updateDisplay();
+        }
+
+        // Backspace function
+        function backspace() {
+            if (currentInput.length > 1) {
+                currentInput = currentInput.slice(0, -1);
+            } else {
+                currentInput = '0';
+            }
+            updateDisplay();
+        }
+
+        // Memory functions
+        function memoryClear() {
+            memoryValue = 0;
+            memoryIndicator.style.display = 'none';
+        }
+
+        function memoryRecall() {
+            currentInput = memoryValue.toString();
+            shouldResetScreen = true;
+            updateDisplay();
+        }
+
+        function memoryAdd() {
+            const current = parseFloat(currentInput);
+            if (!isNaN(current)) {
+                memoryValue += current;
+                memoryIndicator.style.display = 'block';
+            }
+        }
+
+        function memorySubtract() {
+            const current = parseFloat(currentInput);
+            if (!isNaN(current)) {
+                memoryValue -= current;
+                memoryIndicator.style.display = 'block';
+            }
+        }
+
+        // History functions
+        function addToHistory(calculation) {
+            calculationHistory.unshift(calculation);
+            
+            if (calculationHistory.length > 10) {
+                calculationHistory.pop();
+            }
+            
+            updateHistoryDisplay();
+        }
+
+        function updateHistoryDisplay() {
+            historyList.innerHTML = '';
+            
+            calculationHistory.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                
+                // Split expression and result
+                const parts = item.split(' = ');
+                historyItem.innerHTML = `
+                    <div class="history-expression">${parts[0]}</div>
+                    <div class="history-result">${parts[1]}</div>
+                `;
+                
+                historyList.appendChild(historyItem);
+            });
+        }
+
+        function toggleHistory() {
+            if (historyPanel.style.display === 'block') {
+                historyPanel.style.display = 'none';
+            } else {
+                historyPanel.style.display = 'block';
+                updateHistoryDisplay();
+            }
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', function(event) {
+            const key = event.key;
+            
+            // Number keys
+            if (key >= '0' && key <= '9') {
+                appendNumber(key);
+            }
+            // Decimal point
+            else if (key === '.') {
+                appendDecimal();
+            }
+            // Operations
+            else if (key === '+' || key === '-') {
+                appendOperation(key);
+            }
+            // Multiplication
+            else if (key === '*' || key.toLowerCase() === 'x') {
+                appendOperation('×');
+            }
+            // Division
+            else if (key === '/') {
+                event.preventDefault(); // Prevent browser find
+                appendOperation('÷');
+            }
+            // Equals or Enter
+            else if (key === '=' || key === 'Enter') {
+                event.preventDefault();
+                calculateResult();
+            }
+            // Escape for clear all
+            else if (key === 'Escape') {
+                clearAll();
+            }
+            // Backspace
+            else if (key === 'Backspace') {
+                backspace();
+            }
+            // Delete for clear entry
+            else if (key === 'Delete') {
+                clearEntry();
+            }
+        });
+
+        // Initialize display
+        updateDisplay();
+        
+        // Add sample history items
+        setTimeout(() => {
+            addToHistory('12 + 8 = 20');
+            addToHistory('15 × 3 = 45');
+            addToHistory('100 ÷ 4 = 25');
+        }, 500);
+    </script>
+</body>
+</html>
